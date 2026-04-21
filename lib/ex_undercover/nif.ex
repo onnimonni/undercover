@@ -18,9 +18,7 @@ defmodule ExUndercover.Nif do
     nif_versions: ["2.17"],
     targets: [
       "aarch64-unknown-linux-gnu",
-      "x86_64-unknown-linux-gnu",
-      "aarch64-apple-darwin",
-      "x86_64-apple-darwin"
+      "x86_64-unknown-linux-gnu"
     ]
 
   @spec request(binary()) :: {:ok, map()} | {:error, term()}
