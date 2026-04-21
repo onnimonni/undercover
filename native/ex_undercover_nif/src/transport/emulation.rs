@@ -8,7 +8,7 @@ use wreq::http1::Http1Options;
 use wreq::http2::{
     Http2Options, PseudoId, PseudoOrder, SettingId, SettingsOrder, StreamDependency, StreamId,
 };
-use wreq::tls::compress::{CertificateCompressionAlgorithm, CertificateCompressor};
+use wreq::tls::compress::{CertificateCompressionAlgorithm, CertificateCompressor, Codec};
 use wreq::tls::{AlpnProtocol, AlpsProtocol, ExtensionType, KeyShare, TlsOptions, TlsVersion};
 use wreq::Emulation;
 
@@ -18,16 +18,20 @@ struct BrotliCertCompressor;
 static BROTLI_CERT_COMPRESSOR: BrotliCertCompressor = BrotliCertCompressor;
 
 impl CertificateCompressor for BrotliCertCompressor {
-    fn compress(&self, input: &[u8], output: &mut dyn io::Write) -> io::Result<()> {
-        let mut writer = CompressorWriter::new(output, input.len(), 11, 22);
-        writer.write_all(input)?;
-        writer.flush()
+    fn compress(&self) -> Codec {
+        Codec::Dynamic(Box::new(|input, output| {
+            let mut writer = CompressorWriter::new(output, input.len(), 11, 22);
+            writer.write_all(input)?;
+            writer.flush()
+        }))
     }
 
-    fn decompress(&self, input: &[u8], output: &mut dyn io::Write) -> io::Result<()> {
-        let mut reader = Decompressor::new(input, 4096);
-        io::copy(&mut reader, output)?;
-        Ok(())
+    fn decompress(&self) -> Codec {
+        Codec::Dynamic(Box::new(|input, output| {
+            let mut reader = Decompressor::new(input, 4096);
+            io::copy(&mut reader, output)?;
+            Ok(())
+        }))
     }
 
     fn algorithm(&self) -> CertificateCompressionAlgorithm {

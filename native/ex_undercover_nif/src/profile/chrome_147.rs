@@ -1,4 +1,4 @@
-use super::{BrowserProfile, Http2Profile, Http2StreamDependency, TlsProfile};
+use super::{BrowserProfile, Http2Profile, TlsProfile};
 
 pub fn chrome_147() -> BrowserProfile {
     BrowserProfile {
