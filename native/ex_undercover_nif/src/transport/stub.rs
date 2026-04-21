@@ -92,17 +92,25 @@ fn client_from_payload(payload: &RequestPayload) -> Result<Client, RequestError>
     let mut builder = Client::builder().connect_timeout(Duration::from_secs(15));
 
     // HTTP CONNECT proxy (e.g. fauxbrowser on http://127.0.0.1:18443).
-    // Takes priority over proxy_tunnel / SO_BINDTODEVICE: the NIF applies
-    // Chrome TLS fingerprinting; the proxy handles VPN routing over CONNECT.
+    // Takes priority over proxy_tunnel / SO_BINDTODEVICE / SO_MARK.
     if let Some(proxy_url) = metadata_string(&payload.metadata, "proxy_url") {
         let proxy = wreq::Proxy::all(proxy_url)
             .map_err(|err| RequestError::Protocol(err.to_string()))?;
         builder = builder.proxy(proxy);
     } else {
         // No explicit proxy: disable env-var proxy detection and optionally
-        // bind to a specific WireGuard interface via SO_BINDTODEVICE.
+        // route through VPN via fwmark (SO_MARK) or SO_BINDTODEVICE.
         builder = builder.no_proxy();
-        // Bind to WireGuard interface if specified (SO_BINDTODEVICE on Linux).
+
+        // SO_MARK for policy-based routing (Linux only).
+        // Works with `ip rule` + `ip route table` pointing to WireGuard.
+        // Preferred over SO_BINDTODEVICE for WireGuard (BINDTODEVICE + TCP = EADDRNOTAVAIL).
+        #[cfg(target_os = "linux")]
+        if let Some(mark) = metadata_u32(&payload.metadata, "fwmark") {
+            builder = builder.fwmark(mark);
+        }
+
+        // Fallback: bind to WireGuard interface via SO_BINDTODEVICE.
         if let Some(iface) = &payload.proxy_tunnel {
             builder = builder.interface(iface.clone());
         }
@@ -202,6 +210,12 @@ fn diagnostics(
         Value::Bool(metadata_string(&payload.metadata, "proxy_url").is_some()),
     );
     diagnostics.insert(
+        "fwmark".to_string(),
+        metadata_u32(&payload.metadata, "fwmark")
+            .map(|v| Value::Number(v.into()))
+            .unwrap_or(Value::Null),
+    );
+    diagnostics.insert(
         "metadata_keys".to_string(),
         Value::Array(
             payload
@@ -226,6 +240,10 @@ fn metadata_string<'a>(metadata: &'a BTreeMap<String, Value>, key: &str) -> Opti
 
 fn metadata_bool(metadata: &BTreeMap<String, Value>, key: &str) -> Option<bool> {
     metadata.get(key)?.as_bool()
+}
+
+fn metadata_u32(metadata: &BTreeMap<String, Value>, key: &str) -> Option<u32> {
+    metadata.get(key)?.as_u64().and_then(|v| u32::try_from(v).ok())
 }
 
 #[cfg(test)]
