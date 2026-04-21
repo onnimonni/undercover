@@ -1,4 +1,4 @@
-defmodule ExFingerprint.TestSupport.HTTPServer do
+defmodule ExUndercover.TestSupport.HTTPServer do
   @moduledoc false
 
   def start_link(handler) when is_function(handler, 1) do

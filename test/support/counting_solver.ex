@@ -1,5 +1,5 @@
-defmodule ExFingerprint.TestSupport.CountingSolver do
-  @behaviour ExFingerprint.Solver
+defmodule ExUndercover.TestSupport.CountingSolver do
+  @behaviour ExUndercover.Solver
 
   @default_result %{
     browser: :chrome,

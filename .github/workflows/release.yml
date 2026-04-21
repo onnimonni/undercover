@@ -68,7 +68,7 @@ jobs:
 
       - name: Build NIF (native)
         if: "!matrix.use_cross"
-        working-directory: native/ex_fingerprint_nif
+        working-directory: native/ex_undercover_nif
         env:
           CC: clang
           CXX: clang++
@@ -77,23 +77,23 @@ jobs:
 
       - name: Build NIF (cross)
         if: matrix.use_cross
-        working-directory: native/ex_fingerprint_nif
+        working-directory: native/ex_undercover_nif
         run: |
           cross build --release --target ${{ matrix.target }}
 
       - name: Package NIF as .so.tar.gz
-        working-directory: native/ex_fingerprint_nif
+        working-directory: native/ex_undercover_nif
         run: |
           VERSION=${{ steps.version.outputs.version }}
           TARGET=${{ matrix.target }}
           # NIF 2.17 = OTP 27/28. Production uses OTP 28 (nif-2.17).
           NIF_VERSION="2.17"
-          BASENAME="libex_fingerprint_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so"
+          BASENAME="libex_undercover_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so"
           # macOS produces .dylib; rustler_precompiled convention is .so for all platforms
           if [ "$(uname)" = "Darwin" ]; then
-            cp target/${TARGET}/release/libex_fingerprint_nif.dylib ${BASENAME}
+            cp target/${TARGET}/release/libex_undercover_nif.dylib ${BASENAME}
           else
-            cp target/${TARGET}/release/libex_fingerprint_nif.so ${BASENAME}
+            cp target/${TARGET}/release/libex_undercover_nif.so ${BASENAME}
           fi
           tar czf "${BASENAME}.tar.gz" "${BASENAME}"
           echo "ARTIFACT=${BASENAME}.tar.gz" >> $GITHUB_ENV
@@ -108,8 +108,8 @@ jobs:
         with:
           name: nif-${{ matrix.target }}
           path: |
-            native/ex_fingerprint_nif/*.tar.gz
-            native/ex_fingerprint_nif/*.sha256
+            native/ex_undercover_nif/*.tar.gz
+            native/ex_undercover_nif/*.sha256
           if-no-files-found: error
 
   create_release:
@@ -161,4 +161,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mix deps.get
-          EX_FINGERPRINT_BUILD=false mix rustler_precompiled.download ExFingerprint.Nif --all --print
+          EX_UNDERCOVER_BUILD=false mix rustler_precompiled.download ExUndercover.Nif --all --print

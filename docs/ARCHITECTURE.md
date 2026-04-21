@@ -13,7 +13,7 @@ This project keeps the same high-level responsibilities as
 - gVisor netstack
 - custom dialer inside the proxy binary
 
-`ex_fingerprint`:
+`ex_undercover`:
 
 - kernel WireGuard device
 - interface lifecycle managed from Elixir with `wireguardex`
@@ -28,7 +28,7 @@ This project keeps the same high-level responsibilities as
 - `tls-client`
 - browser profiles embedded in the proxy process
 
-`ex_fingerprint`:
+`ex_undercover`:
 
 - Rustler NIF transport
 - versioned browser profiles selected from Elixir
@@ -42,7 +42,7 @@ This project keeps the same high-level responsibilities as
 - response inspection triggers rotation
 - solver cookies and host-level diagnostics in Go
 
-`ex_fingerprint`:
+`ex_undercover`:
 
 - Elixir supervision and orchestration
 - future Phoenix/Bandit or plain TCP listener if proxy mode is still desired
@@ -54,22 +54,22 @@ This project keeps the same high-level responsibilities as
 
 - chromedp launched on demand
 
-`ex_fingerprint`:
+`ex_undercover`:
 
 - explicit solver behaviour in Elixir
 - pluggable real-Chrome backend later
 
 ## Initial module split
 
-- `ExFingerprint.Client`
+- `ExUndercover.Client`
   Elixir API boundary for request execution.
-- `ExFingerprint.Profile`
+- `ExUndercover.Profile`
   Versioned browser profile selection.
-- `ExFingerprint.WireGuard.Manager`
+- `ExUndercover.WireGuard.Manager`
   Kernel WireGuard lifecycle only.
-- `ExFingerprint.Solver`
+- `ExUndercover.Solver`
   Real browser escalation boundary.
-- `ExFingerprint.Nif`
+- `ExUndercover.Nif`
   Native transport boundary.
 
 ## Important non-goal

@@ -1,10 +1,10 @@
-defmodule ExFingerprint.MixProject do
+defmodule ExUndercover.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :ex_fingerprint,
-      version: "0.1.1",
+      app: :ex_undercover,
+      version: "0.2.0",
       elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: test_coverage(),
@@ -15,7 +15,7 @@ defmodule ExFingerprint.MixProject do
 
   def application do
     [
-      mod: {ExFingerprint.Application, []},
+      mod: {ExUndercover.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -28,26 +28,26 @@ defmodule ExFingerprint.MixProject do
       summary: [threshold: 90],
       ignore_modules: [
         ~r/^Mix\.Tasks\./,
-        ExFingerprint,
-        ExFingerprint.Capture.ClientHello,
-        ExFingerprint.CookieJar,
-        ExFingerprint.CookieJar.Cookie,
-        ExFingerprint.Debug,
-        ExFingerprint.Nif,
-        ExFingerprint.Proton,
-        ExFingerprint.Profile.Chrome147,
-        ExFingerprint.ProfileRegistry,
-        ExFingerprint.Runtime,
-        ExFingerprint.Solver,
-        ExFingerprint.Solver.Chrome,
-        ExFingerprint.Solver.Chrome.CDPConnection,
-        ExFingerprint.TestSupport.CountingSolver,
-        ExFingerprint.TestSupport.HTTPServer,
-        ExFingerprint.Transport.ProfileSync,
-        ExFingerprint.WireGuard.PolicyRouting,
-        ExFingerprint.WireGuard.Config,
-        ExFingerprint.WireGuard.InterfaceConfig,
-        ExFingerprint.WireGuard.Manager
+        ExUndercover,
+        ExUndercover.Capture.ClientHello,
+        ExUndercover.CookieJar,
+        ExUndercover.CookieJar.Cookie,
+        ExUndercover.Debug,
+        ExUndercover.Nif,
+        ExUndercover.Proton,
+        ExUndercover.Profile.Chrome147,
+        ExUndercover.ProfileRegistry,
+        ExUndercover.Runtime,
+        ExUndercover.Solver,
+        ExUndercover.Solver.Chrome,
+        ExUndercover.Solver.Chrome.CDPConnection,
+        ExUndercover.TestSupport.CountingSolver,
+        ExUndercover.TestSupport.HTTPServer,
+        ExUndercover.Transport.ProfileSync,
+        ExUndercover.WireGuard.PolicyRouting,
+        ExUndercover.WireGuard.Config,
+        ExUndercover.WireGuard.InterfaceConfig,
+        ExUndercover.WireGuard.Manager
       ]
     ]
   end

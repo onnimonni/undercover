@@ -1,6 +1,6 @@
 import Config
 
-config :ex_fingerprint,
+config :ex_undercover,
   default_browser_profile: :chrome_latest,
   solver: :chrome,
   profile_aliases: %{
@@ -8,5 +8,5 @@ config :ex_fingerprint,
   }
 
 config :rustler,
-  otp_app: :ex_fingerprint,
-  crate: "ex_fingerprint_nif"
+  otp_app: :ex_undercover,
+  crate: "ex_undercover_nif"

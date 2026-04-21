@@ -1,5 +1,5 @@
-defmodule ExFingerprint.TestSupport.TestSolver do
-  @behaviour ExFingerprint.Solver
+defmodule ExUndercover.TestSupport.TestSolver do
+  @behaviour ExUndercover.Solver
 
   @impl true
   def solve(_url, _opts) do
