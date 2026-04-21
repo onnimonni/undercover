@@ -152,6 +152,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mix deps.get
+          # Remove placeholder checksums — rustler_precompiled fails if the file
+          # exists with non-matching hashes. Deleting lets it create a fresh file.
+          rm -f checksum-Elixir.ExUndercover.Nif.exs
           EX_UNDERCOVER_BUILD=false mix rustler_precompiled.download ExUndercover.Nif --all --print
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
