@@ -89,13 +89,23 @@ async fn dispatch_async(
 }
 
 fn client_from_payload(payload: &RequestPayload) -> Result<Client, RequestError> {
-    let mut builder = Client::builder()
-        .connect_timeout(Duration::from_secs(15))
-        .no_proxy();
+    let mut builder = Client::builder().connect_timeout(Duration::from_secs(15));
 
-    // Bind to WireGuard interface if specified (SO_BINDTODEVICE on Linux).
-    if let Some(iface) = &payload.proxy_tunnel {
-        builder = builder.interface(iface.clone());
+    // HTTP CONNECT proxy (e.g. fauxbrowser on http://127.0.0.1:18443).
+    // Takes priority over proxy_tunnel / SO_BINDTODEVICE: the NIF applies
+    // Chrome TLS fingerprinting; the proxy handles VPN routing over CONNECT.
+    if let Some(proxy_url) = metadata_string(&payload.metadata, "proxy_url") {
+        let proxy = wreq::Proxy::all(proxy_url)
+            .map_err(|err| RequestError::Protocol(err.to_string()))?;
+        builder = builder.proxy(proxy);
+    } else {
+        // No explicit proxy: disable env-var proxy detection and optionally
+        // bind to a specific WireGuard interface via SO_BINDTODEVICE.
+        builder = builder.no_proxy();
+        // Bind to WireGuard interface if specified (SO_BINDTODEVICE on Linux).
+        if let Some(iface) = &payload.proxy_tunnel {
+            builder = builder.interface(iface.clone());
+        }
     }
 
     if let Some(path) = metadata_string(&payload.metadata, "ca_cert_file") {
@@ -186,6 +196,10 @@ fn diagnostics(
     diagnostics.insert(
         "proxy_tunnel_requested".to_string(),
         Value::Bool(payload.proxy_tunnel.is_some()),
+    );
+    diagnostics.insert(
+        "proxy_url_requested".to_string(),
+        Value::Bool(metadata_string(&payload.metadata, "proxy_url").is_some()),
     );
     diagnostics.insert(
         "metadata_keys".to_string(),
