@@ -124,12 +124,15 @@ pub fn chrome_147() -> BrowserProfile {
             notes: "Chrome 147 template backed by BoringSSL-style TLS options. Replace values from fresh capture when Chrome 148 ships.".to_string(),
         },
         http2: Http2Profile {
+            // Chrome 110+ disables RFC 7540 priorities (no_rfc7540_priorities=1).
+            // Chrome pseudo-header order is :method, :authority, :scheme, :path.
             pseudo_header_order: vec![
                 ":method".to_string(),
-                ":path".to_string(),
                 ":authority".to_string(),
                 ":scheme".to_string(),
+                ":path".to_string(),
             ],
+            // All 8 Chrome SETTINGS in wire order.
             settings_order: vec![
                 "header_table_size".to_string(),
                 "enable_push".to_string(),
@@ -140,19 +143,23 @@ pub fn chrome_147() -> BrowserProfile {
                 "enable_connect_protocol".to_string(),
                 "no_rfc7540_priorities".to_string(),
             ],
+            // Correct Chrome 130+ HTTP/2 settings.
+            // Produces Akamai fingerprint: 1:65536;2:0;3:1000;4:6291456;5:16384;6:262144;7:1;9:1
             settings: vec![
                 ("header_table_size".to_string(), 65536),
                 ("enable_push".to_string(), 0),
-                ("initial_window_size".to_string(), 131072),
+                ("max_concurrent_streams".to_string(), 1000),
+                ("initial_window_size".to_string(), 6_291_456),
                 ("max_frame_size".to_string(), 16384),
+                ("max_header_list_size".to_string(), 262144),
+                ("enable_connect_protocol".to_string(), 1),
+                ("no_rfc7540_priorities".to_string(), 1),
             ],
             initial_stream_id: Some(3),
-            initial_connection_window_size: Some(12_582_912),
-            stream_dependency: Some(Http2StreamDependency {
-                stream_id: 0,
-                weight: 41,
-                exclusive: false,
-            }),
+            // WINDOW_UPDATE = initial_connection_window_size − 65535 = 15663105
+            initial_connection_window_size: Some(15_728_640),
+            // Chrome 110+ disabled priority frames via no_rfc7540_priorities.
+            stream_dependency: None,
             priority_header: Some("u=0, i".to_string()),
         },
     }

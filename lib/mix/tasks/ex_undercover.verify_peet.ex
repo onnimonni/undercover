@@ -4,13 +4,15 @@ defmodule Mix.Tasks.ExUndercover.VerifyPeet do
   @shortdoc "Verify Chrome impersonation against tls.peet.ws"
 
   @expected_ja4 "t13d1717h2_5b57614c22b0_3cbfd9057e0d"
-  @expected_akamai "1:65536;2:0;4:131072;5:16384|12517377|0|m,p,a,s"
-  @expected_akamai_hash "6ea73faa8fc5aac76bded7bd238f6433"
+  # Chrome 130+ Akamai fingerprint: 8 SETTINGS + WINDOW_UPDATE 15663105 + m,a,s,p pseudo-order.
+  # 9:1 = NO_RFC7540_PRIORITIES. Hash must be updated after verifying via tls.peet.ws.
+  @expected_akamai "1:65536;2:0;3:1000;4:6291456;5:16384;6:262144;7:1;9:1|15663105|0|m,a,s,p"
+  @expected_akamai_hash "TODO_run_verify_peet_to_get_real_hash"
   @expected_header_order [
     ":method",
-    ":path",
     ":authority",
     ":scheme",
+    ":path",
     "sec-ch-ua",
     "sec-ch-ua-mobile",
     "sec-ch-ua-platform",
