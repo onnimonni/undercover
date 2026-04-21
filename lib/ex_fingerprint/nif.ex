@@ -18,6 +18,8 @@ defmodule ExFingerprint.Nif do
     # Default: download precompiled NIF from GitHub releases.
     force_build: System.get_env("EX_FINGERPRINT_BUILD") in ["1", "true"],
     version: @version,
+    # NIF 2.17 = OTP 27/28. We target OTP 28 in production; declare only 2.17.
+    nif_versions: ["2.17"],
     targets: [
       "aarch64-unknown-linux-gnu",
       "x86_64-unknown-linux-gnu",
