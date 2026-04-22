@@ -167,6 +167,8 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git rebase origin/main
           git add checksum-Elixir.ExUndercover.Nif.exs
           git diff --cached --quiet || git commit -m "chore: update NIF checksums for ${GITHUB_REF_NAME}"
           git push origin HEAD:main
