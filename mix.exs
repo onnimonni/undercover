@@ -4,7 +4,7 @@ defmodule ExUndercover.MixProject do
   def project do
     [
       app: :ex_undercover,
-      version: "0.6.0",
+      version: "0.5.0",
       elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: test_coverage(),
@@ -30,6 +30,10 @@ defmodule ExUndercover.MixProject do
         ~r/^Mix\.Tasks\./,
         ExUndercover,
         ExUndercover.Capture.ClientHello,
+        # Client and Transport require a loaded NIF to execute — excluded from
+        # coverage when running without STUFFIX_NATIVE_FINGERPRINT=true.
+        ExUndercover.Client,
+        ExUndercover.Transport,
         ExUndercover.CookieJar,
         ExUndercover.CookieJar.Cookie,
         ExUndercover.Debug,
