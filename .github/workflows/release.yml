@@ -160,15 +160,15 @@ jobs:
             sha=$(sha256sum "/tmp/${filename}" | cut -d' ' -f1)
             ENTRIES="${ENTRIES}  \"${filename}\" =>\n    \"sha256:${sha}\",\n"
           done
-
-          # Write Elixir-syntax checksum file
-          printf "%%{\n${ENTRIES}}\n" > checksum-Elixir.ExUndercover.Nif.exs
-          cat checksum-Elixir.ExUndercover.Nif.exs
+          # Write Elixir-syntax checksum file to /tmp first, copy after rebase
+          printf "%%{\n${ENTRIES}}\n" > /tmp/checksum-Elixir.ExUndercover.Nif.exs
+          cat /tmp/checksum-Elixir.ExUndercover.Nif.exs
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin main
           git rebase origin/main
+          cp /tmp/checksum-Elixir.ExUndercover.Nif.exs checksum-Elixir.ExUndercover.Nif.exs
           git add checksum-Elixir.ExUndercover.Nif.exs
           git diff --cached --quiet || git commit -m "chore: update NIF checksums for ${GITHUB_REF_NAME}"
           git push origin HEAD:main
